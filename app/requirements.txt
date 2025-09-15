@@ -1,0 +1,10 @@
+sentence-transformers
+streamlit
+langchain
+langchain_community
+fpdf
+docx-python
+youtube-transcript-api
+pytube
+langchain-community
+langchain-text-splitters

@@ -1,0 +1,19 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.routes import transcript, qa, mcq
+
+app = FastAPI(title="YT Q&A + MCQ Generator", version="1.1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Register routers
+app.include_router(transcript.router, prefix="/transcript", tags=["Transcript"])
+app.include_router(qa.router, prefix="/qa", tags=["Q&A"])
+app.include_router(mcq.router, prefix="/mcq", tags=["MCQs"])
