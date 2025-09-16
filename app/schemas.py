@@ -19,5 +19,13 @@ class QAResponse(BaseModel):
 class LoadResponse(BaseModel):
     message: str
 
+from typing import Any
+
+class MCQItem(BaseModel):
+    number: int
+    question: str
+    options: list[str]
+    correct_answer: str
+
 class MCQTextResponse(BaseModel):
-    mcqs: str
+    mcqs: list[MCQItem]

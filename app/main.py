@@ -1,9 +1,15 @@
-from fastapi import FastAPI
+import os
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-
 from app.routes import transcript, qa, mcq
+from app.auth import get_current_user
 
-app = FastAPI(title="YT Q&A + MCQ Generator", version="1.1.0")
+app = FastAPI(
+    title="YT Q&A + MCQ Generator",
+    version="1.1.0",
+    dependencies=[Depends(get_current_user)]  # Require Clerk auth globally
+)
+
 
 app.add_middleware(
     CORSMiddleware,

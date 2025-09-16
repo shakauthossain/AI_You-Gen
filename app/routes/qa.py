@@ -19,15 +19,18 @@ async def ask_question(req: QuestionRequest):
     def work():  # <-- sync
         results = db.similarity_search(req.question, k=4)
         context = " ".join(doc.page_content for doc in results)
+        print(f"[QA/ASK] Context for prompt: {context[:500]}...")
         prompt = f"""You are a helpful assistant...
 Transcript:
 {context}
 
 Question: {req.question}
 Answer:"""
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.0-flash")
         resp = model.generate_content(prompt)
+        print(f"[QA/ASK] Raw model response: {resp}")
         answer = extract_text(resp) or "I don't know."
+        print(f"[QA/ASK] Extracted answer: {answer}")
         snippets = [build_snippet(doc, url) for doc in results]
         return {"answer": answer, "snippets": snippets}
 

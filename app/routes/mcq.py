@@ -20,9 +20,11 @@ async def generate_mcqs(req: MCQRequest):
     def work():  # <-- sync
         text = " ".join(doc.page_content for doc in docs)
         prompt = MCQ_TEMPLATE.format(num=req.num_mcqs) + "\n\nSource:\n" + text[:200000]
-        model = genai.GenerativeModel("gemini-1.5-pro")
+        model = genai.GenerativeModel("gemini-2.0-flash")
         resp = model.generate_content(prompt)
-        mcqs = extract_text(resp)
+        mcq_text = extract_text(resp)
+        from app.utils.llm import parse_mcq_text
+        mcqs = parse_mcq_text(mcq_text)
         return {"mcqs": mcqs}
 
     return await run_in_threadpool(work)
