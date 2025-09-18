@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        'robot-reavers': ['Roboto', 'sans-serif'],
+        'sans': ['Roboto', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -23,7 +27,12 @@ export default {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
           hover: "hsl(var(--primary-hover))",
+          dark: "hsl(var(--primary-dark))",
         },
+        "dark-blue": "hsl(var(--dark-blue))",
+        "slate-blue": "hsl(var(--slate-blue))",
+        "light-blue": "hsl(var(--light-blue))",
+        "soft-pale": "hsl(var(--soft-pale))",
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",

@@ -23,3 +23,7 @@ app.add_middleware(
 app.include_router(transcript.router, prefix="/transcript", tags=["Transcript"])
 app.include_router(qa.router, prefix="/qa", tags=["Q&A"])
 app.include_router(mcq.router, prefix="/mcq", tags=["MCQs"])
+
+@app.get("/protected")
+def protected_route(user=Depends(get_current_user)):
+    return {"message": "This is protected", "user": user}

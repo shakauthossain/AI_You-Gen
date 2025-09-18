@@ -23,20 +23,24 @@ class ApiService {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    token?: string
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     console.log('📡 Making API request:', {
       method: options.method || 'GET',
       url,
       body: options.body ? JSON.parse(options.body as string) : null
     });
 
+    const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
+
     try {
       const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
+          ...authHeaders,
           ...options.headers,
         },
         ...options,
@@ -56,7 +60,6 @@ class ApiService {
           error: errorText,
           url
         });
-        
         throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
       }
 
@@ -72,15 +75,15 @@ class ApiService {
     }
   }
 
-  async loadTranscript(request: TranscriptLoadRequest): Promise<TranscriptLoadResponse> {
+  async loadTranscript(request: TranscriptLoadRequest, token?: string): Promise<TranscriptLoadResponse> {
     console.log('🎬 Loading transcript for URL:', request.url);
     return this.request<TranscriptLoadResponse>(API_ENDPOINTS.TRANSCRIPT_LOAD, {
       method: 'POST',
       body: JSON.stringify(request),
-    });
+    }, token);
   }
 
-  async askQuestion(request: QARequest): Promise<QAResponse> {
+  async askQuestion(request: QARequest, token?: string): Promise<QAResponse> {
     console.log('❓ Asking question:', {
       url: request.url,
       question: request.question.substring(0, 100) + (request.question.length > 100 ? '...' : '')
@@ -88,18 +91,18 @@ class ApiService {
     return this.request<QAResponse>(API_ENDPOINTS.QA_ASK, {
       method: 'POST',
       body: JSON.stringify(request),
-    });
+    }, token);
   }
 
-  async generateMCQs(request: MCQGenerateRequest): Promise<MCQGenerateResponse> {
+  async generateMCQs(request: MCQGenerateRequest, token?: string): Promise<MCQGenerateResponse> {
     console.log('📝 Generating MCQs:', request);
     return this.request<MCQGenerateResponse>(API_ENDPOINTS.MCQ_GENERATE, {
       method: 'POST',
       body: JSON.stringify(request),
-    });
+    }, token);
   }
 
-  async downloadMCQsPDF(request: MCQDownloadRequest): Promise<Blob> {
+  async downloadMCQsPDF(request: MCQDownloadRequest, token?: string): Promise<Blob> {
     console.log('📄 Downloading MCQs as PDF:', request);
     const url = `${this.baseUrl}${API_ENDPOINTS.MCQ_DOWNLOAD_PDF}`;
     
@@ -107,6 +110,7 @@ class ApiService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify(request),
     });
@@ -121,7 +125,7 @@ class ApiService {
     return response.blob();
   }
 
-  async downloadMCQsDOCX(request: MCQDownloadRequest): Promise<Blob> {
+  async downloadMCQsDOCX(request: MCQDownloadRequest, token?: string): Promise<Blob> {
     console.log('📄 Downloading MCQs as DOCX:', request);
     const url = `${this.baseUrl}${API_ENDPOINTS.MCQ_DOWNLOAD_DOCX}`;
     
@@ -129,6 +133,7 @@ class ApiService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify(request),
     });
@@ -143,20 +148,20 @@ class ApiService {
     return response.blob();
   }
 
-  async generateBlog(request: BlogGenerateRequest): Promise<BlogGenerateResponse> {
+  async generateBlog(request: BlogGenerateRequest, token?: string): Promise<BlogGenerateResponse> {
     console.log('📝 Generating blog:', request);
     return this.request<BlogGenerateResponse>(API_ENDPOINTS.BLOG_GENERATE, {
       method: 'POST',
       body: JSON.stringify(request),
-    });
+    }, token);
   }
 
-  async generateClips(request: ClipsGenerateRequest): Promise<ClipsGenerateResponse> {
+  async generateClips(request: ClipsGenerateRequest, token?: string): Promise<ClipsGenerateResponse> {
     console.log('🎬 Generating clips:', request);
     return this.request<ClipsGenerateResponse>(API_ENDPOINTS.CLIPS_GENERATE, {
       method: 'POST',
       body: JSON.stringify(request),
-    });
+    }, token);
   }
 }
 

@@ -1,52 +1,71 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, PenTool, Film, Copy, Check } from 'lucide-react';
-import { apiService } from '@/services/api';
-import { useToast } from '@/components/ui/use-toast';
-import ReactMarkdown from 'react-markdown';
-import type { BlogGenerateResponse, ClipsGenerateResponse } from '@/types/api';
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, PenTool, Film, Copy, Check } from "lucide-react";
+import { apiService } from "@/services/api";
+import { useToast } from "@/components/ui/use-toast";
+import ReactMarkdown from "react-markdown";
+import type { BlogGenerateResponse, ClipsGenerateResponse } from "@/types/api";
+import { useAuth } from "@clerk/clerk-react";
 
 interface ContentCreatorTabProps {
   url: string;
   canGenerate: boolean;
 }
 
-export function ContentCreatorTab({ url, canGenerate }: ContentCreatorTabProps) {
+export function ContentCreatorTab({
+  url,
+  canGenerate,
+}: ContentCreatorTabProps) {
   const [blogLoading, setBlogLoading] = useState(false);
   const [clipsLoading, setClipsLoading] = useState(false);
-  const [blogResult, setBlogResult] = useState<string>('');
-  const [clipsResult, setClipsResult] = useState<Array<{ title: string; content: string; timestamp?: string }>>([]);
-  const [blogStyle, setBlogStyle] = useState('blog');
+  const [blogResult, setBlogResult] = useState<string>("");
+  const [clipsResult, setClipsResult] = useState<
+    Array<{ title: string; content: string; timestamp?: string; text?: string }>
+  >([]);
+  const [blogStyle, setBlogStyle] = useState("blog");
   const [numClips, setNumClips] = useState(3);
-  const [copiedStates, setCopiedStates] = useState<{ [key: string]: boolean }>({});
+  const [copiedStates, setCopiedStates] = useState<{ [key: string]: boolean }>(
+    {}
+  );
   const { toast } = useToast();
+  const { getToken } = useAuth();
 
   const handleGenerateBlog = async () => {
     if (!url || !canGenerate) return;
-    
+
     setBlogLoading(true);
-    setBlogResult('');
-    
+    setBlogResult("");
+
     try {
-      const response = await apiService.generateBlog({
-        req: { url },
-        style: blogStyle
-      });
-      
-      console.log('Blog API Response:', response);
-      
+      const token = await getToken();
+      const response = await apiService.generateBlog(
+        {
+          req: { url },
+          style: blogStyle,
+        },
+        token
+      );
+
+      console.log("Blog API Response:", response);
+
       // Handle different possible response formats
       const responseAny = response as any;
       if (responseAny.blog) {
         setBlogResult(responseAny.blog);
-      } else if (typeof responseAny === 'string') {
+      } else if (typeof responseAny === "string") {
         setBlogResult(responseAny);
       } else if (responseAny.content) {
         setBlogResult(responseAny.content);
@@ -54,13 +73,13 @@ export function ContentCreatorTab({ url, canGenerate }: ContentCreatorTabProps) 
         // Fallback: show the entire response as JSON
         setBlogResult(JSON.stringify(responseAny, null, 2));
       }
-      
+
       toast({
         title: "Success",
         description: "Blog generated successfully!",
       });
     } catch (error) {
-      console.error('Error generating blog:', error);
+      console.error("Error generating blog:", error);
       toast({
         title: "Error",
         description: "Failed to generate blog. Please try again.",
@@ -73,55 +92,75 @@ export function ContentCreatorTab({ url, canGenerate }: ContentCreatorTabProps) 
 
   const handleGenerateClips = async () => {
     if (!url || !canGenerate) return;
-    
+
     setClipsLoading(true);
     setClipsResult([]);
-    
+
     try {
-      const response = await apiService.generateClips({
-        req: { url },
-        num_clips: numClips
-      });
-      
-      console.log('Clips API Response:', response);
-      
+      const token = await getToken();
+      const response = await apiService.generateClips(
+        {
+          req: { url },
+          num_clips: numClips,
+        },
+        token
+      );
+
+      console.log("Clips API Response:", response);
+
       let processedClips = [];
       const responseAny = response as any;
-      
+
       // Handle different possible response formats
       if (responseAny.clips && Array.isArray(responseAny.clips)) {
         processedClips = responseAny.clips;
       } else if (Array.isArray(responseAny)) {
         processedClips = responseAny;
-      } else if (typeof responseAny === 'object' && responseAny !== null) {
+      } else if (typeof responseAny === "object" && responseAny !== null) {
         // Try to find an array in the response object
         const possibleArrays = Object.values(responseAny).filter(Array.isArray);
         if (possibleArrays.length > 0) {
           processedClips = possibleArrays[0];
         } else {
           // Convert object to a single "clip"
-          processedClips = [{
-            title: "Generated Content",
-            content: JSON.stringify(responseAny, null, 2),
-            timestamp: ""
-          }];
+          processedClips = [
+            {
+              title: "Generated Content",
+              content: JSON.stringify(responseAny, null, 2),
+              timestamp: "",
+            },
+          ];
         }
       }
-      
-      // Ensure each clip has the required structure
-      processedClips = processedClips.map((clip: any, index: number) => ({
-        title: clip.title || `Clip ${index + 1}`,
-        content: clip.content || (typeof clip === 'string' ? clip : JSON.stringify(clip)),
-        timestamp: clip.timestamp || ""
-      }));
-      
+
+      // Ensure each clip has the required structure and style fallback text
+      processedClips = processedClips.map((clip: any, index: number) => {
+        // If fallback: only 'text' is present, use it for both content and text
+        if (clip.text && !clip.content) {
+          return {
+            title: clip.title || `Clip ${index + 1}`,
+            content: clip.text,
+            text: clip.text,
+            timestamp: clip.timestamp || "",
+          };
+        }
+        return {
+          title: clip.title || `Clip ${index + 1}`,
+          content:
+            clip.content ||
+            (typeof clip === "string" ? clip : JSON.stringify(clip)),
+          text: clip.text,
+          timestamp: clip.timestamp || "",
+        };
+      });
+
       setClipsResult(processedClips);
       toast({
         title: "Success",
         description: `${processedClips.length} clips generated successfully!`,
       });
     } catch (error) {
-      console.error('Error generating clips:', error);
+      console.error("Error generating clips:", error);
       toast({
         title: "Error",
         description: "Failed to generate clips. Please try again.",
@@ -160,7 +199,9 @@ export function ContentCreatorTab({ url, canGenerate }: ContentCreatorTabProps) 
             <div className="mb-4 p-3 rounded-full bg-primary/10">
               <PenTool className="h-8 w-8 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Content Creator Tools</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              Content Creator Tools
+            </h3>
             <p className="text-muted-foreground mb-4">
               Load a video transcript first to access content creation features.
             </p>
@@ -215,13 +256,15 @@ export function ContentCreatorTab({ url, canGenerate }: ContentCreatorTabProps) 
                         <SelectItem value="blog">Blog Post</SelectItem>
                         <SelectItem value="article">Article</SelectItem>
                         <SelectItem value="casual">Casual</SelectItem>
-                        <SelectItem value="professional">Professional</SelectItem>
+                        <SelectItem value="professional">
+                          Professional
+                        </SelectItem>
                         <SelectItem value="tutorial">Tutorial</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="flex items-end">
-                    <Button 
+                    <Button
                       onClick={handleGenerateBlog}
                       disabled={blogLoading}
                       className="w-full"
@@ -248,7 +291,7 @@ export function ContentCreatorTab({ url, canGenerate }: ContentCreatorTabProps) 
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => copyToClipboard(blogResult, 'blog')}
+                        onClick={() => copyToClipboard(blogResult, "blog")}
                         className="flex items-center gap-1"
                       >
                         {copiedStates.blog ? (
@@ -256,13 +299,11 @@ export function ContentCreatorTab({ url, canGenerate }: ContentCreatorTabProps) 
                         ) : (
                           <Copy className="h-4 w-4" />
                         )}
-                        {copiedStates.blog ? 'Copied!' : 'Copy'}
+                        {copiedStates.blog ? "Copied!" : "Copy"}
                       </Button>
                     </div>
                     <div className="border rounded-md p-4 max-h-[400px] overflow-y-auto bg-background prose prose-sm max-w-none dark:prose-invert">
-                      <ReactMarkdown>
-                        {blogResult}
-                      </ReactMarkdown>
+                      <ReactMarkdown>{blogResult}</ReactMarkdown>
                     </div>
                   </div>
                 )}
@@ -282,7 +323,10 @@ export function ContentCreatorTab({ url, canGenerate }: ContentCreatorTabProps) 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="num-clips">Number of Clips</Label>
-                    <Select value={numClips.toString()} onValueChange={(value) => setNumClips(parseInt(value))}>
+                    <Select
+                      value={numClips.toString()}
+                      onValueChange={(value) => setNumClips(parseInt(value))}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select number" />
                       </SelectTrigger>
@@ -295,7 +339,7 @@ export function ContentCreatorTab({ url, canGenerate }: ContentCreatorTabProps) 
                     </Select>
                   </div>
                   <div className="flex items-end">
-                    <Button 
+                    <Button
                       onClick={handleGenerateClips}
                       disabled={clipsLoading}
                       className="w-full"
@@ -320,19 +364,28 @@ export function ContentCreatorTab({ url, canGenerate }: ContentCreatorTabProps) 
                     <Label>Generated Clips ({clipsResult.length})</Label>
                     <div className="grid gap-4">
                       {clipsResult.map((clip, index) => (
-                        <Card key={index} className="border-l-4 border-l-primary">
+                        <Card
+                          key={index}
+                          className="border-l-4 border-l-primary"
+                        >
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex items-center gap-2">
-                                <Badge variant="secondary">Clip {index + 1}</Badge>
+                                <Badge variant="secondary">
+                                  Clip {index + 1}
+                                </Badge>
                                 {clip.timestamp && (
-                                  <Badge variant="outline">{clip.timestamp}</Badge>
+                                  <Badge variant="outline">
+                                    {clip.timestamp}
+                                  </Badge>
                                 )}
                               </div>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => copyToClipboard(clip.content, `clip-${index}`)}
+                                onClick={() =>
+                                  copyToClipboard(clip.content, `clip-${index}`)
+                                }
                                 className="flex items-center gap-1"
                               >
                                 {copiedStates[`clip-${index}`] ? (
@@ -343,16 +396,32 @@ export function ContentCreatorTab({ url, canGenerate }: ContentCreatorTabProps) 
                               </Button>
                             </div>
                             <h4 className="font-semibold mb-2">{clip.title}</h4>
-                            <div className="text-sm text-muted-foreground leading-relaxed prose prose-sm max-w-none dark:prose-invert">
-                              <ReactMarkdown>
-                                {clip.content}
-                              </ReactMarkdown>
+                            <div className="text-sm text-muted-foreground leading-relaxed text-justify prose prose-sm max-w-none dark:prose-invert rounded p-3 border">
+                              {clip.text ? (
+                                <ReactMarkdown>{clip.text}</ReactMarkdown>
+                              ) : (
+                                <ReactMarkdown>{clip.content}</ReactMarkdown>
+                              )}
                             </div>
                           </CardContent>
                         </Card>
                       ))}
                     </div>
                   </div>
+                )}
+                {clipsResult.length === 0 && !clipsLoading && (
+                  <div className="text-center text-muted-foreground py-8">
+                    <p>
+                      No clips generated yet. Click "Generate Clips" to get
+                      started.
+                    </p>
+                  </div>
+                )}
+                {/* Debug: log clipsResult */}
+                {process.env.NODE_ENV === "development" && (
+                  <pre className="text-xs text-left bg-muted p-2 rounded mt-4 overflow-x-auto">
+                    {JSON.stringify(clipsResult, null, 2)}
+                  </pre>
                 )}
               </CardContent>
             </Card>
