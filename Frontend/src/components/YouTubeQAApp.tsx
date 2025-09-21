@@ -42,6 +42,9 @@ export function YouTubeQAApp() {
       actions.addSystemMessage(
         "✅ Transcript has been successfully loaded! You can now ask questions about the video content, and explore the full transcript in the Transcript tab."
       );
+      if (response.summary) {
+        actions.addSystemMessage(`📝 Video Summary: ${response.summary}`);
+      }
 
       toast({
         title: "Transcript loaded",
@@ -188,16 +191,23 @@ export function YouTubeQAApp() {
     setIsLoading(true);
 
     try {
+      const token = await getToken();
       const blob =
         format === "pdf"
-          ? await apiService.downloadMCQsPDF({
-              url: state.url,
-              num_mcqs: numMcqs,
-            })
-          : await apiService.downloadMCQsDOCX({
-              url: state.url,
-              num_mcqs: numMcqs,
-            });
+          ? await apiService.downloadMCQsPDF(
+              {
+                url: state.url,
+                num_mcqs: numMcqs,
+              },
+              token
+            )
+          : await apiService.downloadMCQsDOCX(
+              {
+                url: state.url,
+                num_mcqs: numMcqs,
+              },
+              token
+            );
 
       // Create download link
       const url = window.URL.createObjectURL(blob);

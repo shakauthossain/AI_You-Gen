@@ -3,8 +3,10 @@ streamlit
 langchain
 langchain_community
 fpdf
-docx-python
+python-docx
 youtube-transcript-api
 pytube
 langchain-community
 langchain-text-splitters
+SQLAlchemy
+psycopg2-binary

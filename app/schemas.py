@@ -18,6 +18,7 @@ class QAResponse(BaseModel):
 
 class LoadResponse(BaseModel):
     message: str
+    summary: str | None = None
 
 from typing import Any
 

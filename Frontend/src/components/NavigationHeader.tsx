@@ -23,6 +23,7 @@ import {
   Star,
   Sparkles,
   Search,
+  MessageCircle,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -126,6 +127,14 @@ export function NavigationHeader() {
             >
               Contact
             </a>
+
+            <Link 
+              to="/chat"
+              className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-2"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Chat
+            </Link>
           </div>
 
           {/* Desktop Actions */}
@@ -212,6 +221,14 @@ export function NavigationHeader() {
                 >
                   Pricing
                 </a>
+                <Link
+                  to="/chat"
+                  className="flex items-center gap-2 p-2 font-medium hover:text-primary transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  Chat
+                </Link>
                 <a
                   href="https://github.com"
                   target="_blank"

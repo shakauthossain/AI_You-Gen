@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import transcript, qa, mcq
+from app.routes import transcript, qa, mcq, chat
 from app.auth import get_current_user
 
 app = FastAPI(
@@ -23,6 +23,7 @@ app.add_middleware(
 app.include_router(transcript.router, prefix="/transcript", tags=["Transcript"])
 app.include_router(qa.router, prefix="/qa", tags=["Q&A"])
 app.include_router(mcq.router, prefix="/mcq", tags=["MCQs"])
+app.include_router(chat.router, prefix="/chat", tags=["Chat"])
 
 @app.get("/protected")
 def protected_route(user=Depends(get_current_user)):

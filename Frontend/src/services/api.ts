@@ -13,7 +13,38 @@ import type {
   ClipsGenerateResponse,
 } from '@/types/api';
 
+// Chat types
+export interface ChatSession {
+  session_id: number;
+  created_at: string;
+  title: string;
+}
+export interface ChatMessage {
+  role: "user" | "assistant";
+  message: string;
+  timestamp: string;
+}
+
 class ApiService {
+  // --- Chat Memory API ---
+  async getChatSessions(token?: string): Promise<ChatSession[]> {
+    return this.request<ChatSession[]>("/chat/sessions", { method: "GET" }, token);
+  }
+
+  async getChatMessages(session_id: number, token?: string): Promise<ChatMessage[]> {
+    return this.request<ChatMessage[]>(`/chat/sessions/${session_id}/messages`, { method: "GET" }, token);
+  }
+
+  async addChatMessage(session_id: number, message: string, role: "user" | "assistant", token?: string): Promise<ChatMessage> {
+    return this.request<ChatMessage>(`/chat/sessions/${session_id}/messages`, {
+      method: "POST",
+      body: JSON.stringify({ message, role }),
+    }, token);
+  }
+
+  async createChatSession(token?: string): Promise<ChatSession> {
+    return this.request<ChatSession>("/chat/sessions", { method: "POST" }, token);
+  }
   private baseUrl: string;
 
   constructor() {

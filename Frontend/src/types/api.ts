@@ -7,6 +7,7 @@ export interface TranscriptLoadRequest {
 export interface TranscriptLoadResponse {
   message: string;
   transcript?: string;
+  summary?: string;
 }
 
 export interface QARequest {

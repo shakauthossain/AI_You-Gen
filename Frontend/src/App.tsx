@@ -8,6 +8,7 @@ import { LandingPage } from "@/components/LandingPage";
 import { YouTubeQAApp } from "@/components/YouTubeQAApp";
 import { Dashboard } from "@/components/auth/Dashboard";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { ChatGPTMemory } from "@/components/ChatGPTMemory";
 import NotFound from "./pages/NotFound";
 import { clerkConfig } from "@/config/clerk";
 
@@ -35,6 +36,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/chat" 
+              element={
+                <ProtectedRoute>
+                  <ChatGPTMemory />
                 </ProtectedRoute>
               } 
             />

@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AskTab } from './tabs/AskTab';
+import { AskTabWithChat } from './tabs/AskTabWithChat';
 import { ContentCreatorTab } from './tabs/ContentCreatorTab';
 import { InsightsTab } from './tabs/InsightsTab';
 import { MCQsTab } from './tabs/MCQsTab';
@@ -72,7 +72,7 @@ export function ContentCanvas({
 
         <div className="flex-1 overflow-hidden">
           <TabsContent value="ask" className="h-full m-0 p-0">
-            <AskTab 
+            <AskTabWithChat 
               conversations={state.conversations} 
               isLoading={isLoading}
               onAskQuestion={onAskQuestion}

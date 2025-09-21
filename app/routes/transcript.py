@@ -19,7 +19,27 @@ async def load_transcript(req: VideoURLRequest):
             # Bad request if transcript missing / HTTP 400s / etc.
             raise HTTPException(status_code=400, detail=str(e))
         video_cache[str(req.url)] = {"docs": docs, "db": db}
-        return {"message": "Transcript loaded successfully."}
+
+        # Generate summary using LLM
+        transcript_text = "\n".join(doc.page_content.strip() for doc in docs)
+        prompt = f"""
+You are a helpful assistant. Summarize the following YouTube video transcript in 3-5 sentences. Focus on the main topic, key points, and any important context. Do not reference the transcript directly or say 'this video'.
+
+Transcript:
+{transcript_text}
+
+Summary:
+"""
+        try:
+            model = genai.GenerativeModel("gemini-2.0-flash")
+            resp = model.generate_content(prompt)
+            from app.utils.llm import extract_text
+            summary = extract_text(resp)
+        except Exception as e:
+            print(f"[SUMMARY] LLM summary generation failed: {e}")
+            summary = None
+
+        return {"message": "Transcript loaded successfully.", "summary": summary}
     return await run_in_threadpool(work)
 
 
