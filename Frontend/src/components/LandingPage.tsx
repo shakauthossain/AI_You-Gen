@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { NavigationHeader } from "@/components/NavigationHeader";
+import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import {
   Brain,
   FileQuestion,
@@ -320,15 +321,28 @@ export const LandingPage = () => {
             </p>
 
             <div className="hero-animate flex flex-col sm:flex-row gap-2">
-              <Button
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-6 text-lg font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 min-h-[60px] focus:ring-4 focus:ring-primary/20 hover-scale animate-float"
-                onClick={() => (window.location.href = "/app")}
-                aria-label="Get a demo of the platform"
-              >
-                Get a Demo
-                <ArrowRight className="ml-3 w-6 h-6" />
-              </Button>
+              <SignedOut>
+                <Button
+                  size="lg"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-6 text-lg font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 min-h-[60px] focus:ring-4 focus:ring-primary/20 hover-scale animate-float"
+                  onClick={() => (window.location.href = "/app")}
+                  aria-label="Get a demo of the platform"
+                >
+                  Get Started
+                  <ArrowRight className="ml-3 w-6 h-6" />
+                </Button>
+              </SignedOut>
+              <SignedIn>
+                <Button
+                  size="lg"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-6 text-lg font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 min-h-[60px] focus:ring-4 focus:ring-primary/20 hover-scale animate-float"
+                  onClick={() => (window.location.href = "/app")}
+                  aria-label="Go to chat interface"
+                >
+                  Let's Chat
+                  <ArrowRight className="ml-3 w-6 h-6" />
+                </Button>
+              </SignedIn>
             </div>
 
             {/* Enhanced call-to-action text */}
@@ -725,12 +739,12 @@ export const LandingPage = () => {
                   </div>
                 )}
 
-                <div className="relative z-20">
+                <div className="relative z-20 h-full">
                   <div className="flex items-center justify-center w-24 h-24 bg-primary/10 rounded-full mb-6 mx-auto group-hover:bg-primary/20 transition-colors duration-300">
                     <div className="text-primary">{step.icon}</div>
                   </div>
 
-                  <div className="bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-shadow duration-300">
+                  <div className="bg-card border border-border border-red-500 h-[220px] rounded-lg p-6 hover:shadow-lg transition-shadow duration-300">
                     <div className="flex items-center justify-center w-8 h-8 bg-primary text-primary-foreground rounded-full text-sm font-bold mb-4 mx-auto">
                       {index + 1}
                     </div>
@@ -748,20 +762,32 @@ export const LandingPage = () => {
 
           {/* Secondary CTA in How It Works */}
           <div className="text-center mt-12">
-            <Button
-              size="lg"
-              onClick={() => (window.location.href = "/app")}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg font-semibold"
-            >
-              Get Started Now
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
+            <SignedOut>
+              <Button
+                size="lg"
+                onClick={() => (window.location.href = "/app")}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg font-semibold"
+              >
+                Get Started Now
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </SignedOut>
+            <SignedIn>
+              <Button
+                size="lg"
+                onClick={() => (window.location.href = "/app")}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg font-semibold"
+              >
+                Let's Chat
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </SignedIn>
           </div>
         </div>
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-24 px-4 bg-white ">
+      {/* <section className="py-24 px-4 bg-white ">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
@@ -813,10 +839,10 @@ export const LandingPage = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Call to Action Section */}
-      <section ref={ctaRef} id="cta" className="py-24 px-4 bg-background ">
+      <section ref={ctaRef} id="cta" className="py-24 px-4 bg-white ">
         <div className="max-w-4xl mx-auto text-center">
           <div className="space-y-8">
             <h2 className="text-4xl md:text-5xl font-black text-foreground leading-tight">
@@ -881,7 +907,7 @@ export const LandingPage = () => {
       </section>
 
       {/* Enhanced Footer with better accessibility and contrast */}
-      <footer className="py-16 px-4 bg-card bg-white">
+      <footer className="py-16 px-4 bg-card !bg-background">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mb-8">
             <div className="space-y-4">
@@ -914,7 +940,7 @@ export const LandingPage = () => {
               </div> */}
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 place-items-center">
               <h4 className="font-semibold text-foreground">Solutions</h4>
               <nav className="space-y-2 text-sm">
                 <button
@@ -978,7 +1004,7 @@ export const LandingPage = () => {
               </nav>
             </div> */}
 
-            <div className="space-y-3">
+            <div className="space-y-3 place-items-center">
               <h4 className="font-semibold text-foreground">Company</h4>
               <nav className="space-y-2 text-sm">
                 <a

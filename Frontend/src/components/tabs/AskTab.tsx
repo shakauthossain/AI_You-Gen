@@ -138,7 +138,7 @@ export function AskTab({
           {/* Hero Section */}
           <div className="space-y-4">
             <div className="w-20 h-20 mx-auto rounded-full gradient-primary flex items-center justify-center shadow-lg">
-              <MessageSquare className="w-10 h-10 text-white" />
+              <MessageSquare />
             </div>
             <div>
               <h1 className="text-2xl font-bold mb-2">

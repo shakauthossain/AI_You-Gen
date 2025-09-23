@@ -18,11 +18,16 @@ export interface ChatSession {
   session_id: number;
   created_at: string;
   title: string;
+  video_url?: string;
+  video_title?: string;
+  message_count?: number;
 }
+
 export interface ChatMessage {
   role: "user" | "assistant";
   message: string;
   timestamp: string;
+  video_context?: string;
 }
 
 class ApiService {
@@ -35,15 +40,39 @@ class ApiService {
     return this.request<ChatMessage[]>(`/chat/sessions/${session_id}/messages`, { method: "GET" }, token);
   }
 
-  async addChatMessage(session_id: number, message: string, role: "user" | "assistant", token?: string): Promise<ChatMessage> {
-    return this.request<ChatMessage>(`/chat/sessions/${session_id}/messages`, {
+  async addChatMessage(
+    session_id: number, 
+    message: string, 
+    role: "user" | "assistant", 
+    token?: string,
+    video_context?: string
+  ): Promise<ChatMessage> {
+    return this.request<ChatMessage>(`/chat/${session_id}/messages`, {
       method: "POST",
-      body: JSON.stringify({ message, role }),
+      body: JSON.stringify({ message, role, video_context }),
     }, token);
   }
 
-  async createChatSession(token?: string): Promise<ChatSession> {
-    return this.request<ChatSession>("/chat/sessions", { method: "POST" }, token);
+  async createChatSession(
+    token?: string, 
+    video_url?: string, 
+    video_title?: string, 
+    title?: string
+  ): Promise<ChatSession> {
+    return this.request<ChatSession>("/chat/sessions", {
+      method: "POST",
+      body: JSON.stringify({ video_url, video_title, title }),
+    }, token);
+  }
+
+  async getChatSessionsByVideo(video_url: string, token?: string): Promise<ChatSession[]> {
+    return this.request<ChatSession[]>(`/chat/sessions/by-video?video_url=${encodeURIComponent(video_url)}`, { method: "GET" }, token);
+  }
+
+  async deleteChatSession(session_id: number, token?: string): Promise<{ success: boolean; message: string; session_id: number }> {
+    return this.request<{ success: boolean; message: string; session_id: number }>(`/chat/sessions/${session_id}`, {
+      method: "DELETE",
+    }, token);
   }
   private baseUrl: string;
 

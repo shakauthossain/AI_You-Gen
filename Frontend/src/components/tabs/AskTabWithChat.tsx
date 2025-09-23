@@ -245,7 +245,7 @@ export function AskTabWithChat({
             <div className="p-4">
               {chatSessions.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50 fill-black" />
                   <p className="text-sm">No chat sessions yet</p>
                   <p className="text-xs">Start a new conversation</p>
                 </div>
@@ -288,8 +288,8 @@ export function AskTabWithChat({
           <div className="text-center space-y-8 max-w-lg w-full">
             {/* Hero Section */}
             <div className="space-y-4">
-              <div className="w-20 h-20 mx-auto rounded-full gradient-primary flex items-center justify-center shadow-lg">
-                <MessageSquare className="w-10 h-10 text-white" />
+              <div className="w-20 h-20 mx-auto rounded-full gradient-primary flex items-center justify-center shadow-lg border-rounded border-2 border-black/5">
+                <MessageSquare className="w-10 h-10 text-black" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold mb-2">
@@ -325,7 +325,9 @@ export function AskTabWithChat({
                   />
 
                   <div className="text-xs text-muted-foreground text-center space-y-1">
-                    <p>✨ Generate MCQs • 🤖 Ask questions • 📊 Get insights</p>
+                    <p>
+                      ✨ Generate MCQs • 🤖 Ask questions • 📊 Get Test Result
+                    </p>
                     <p>Or start chatting without loading a video</p>
                   </div>
                 </div>

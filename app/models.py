@@ -18,6 +18,9 @@ class ChatSession(Base):
     user_id = Column(String, index=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     title = Column(String, default="Untitled Session")
+    # Video context fields
+    video_url = Column(String, nullable=True)  # YouTube URL for video-based sessions
+    video_title = Column(String, nullable=True)  # Video title for better UX
     messages = relationship("ChatMessage", back_populates="session", cascade="all, delete-orphan")
 
 class ChatMessage(Base):
@@ -28,4 +31,6 @@ class ChatMessage(Base):
     role = Column(String, nullable=False)  # 'user' or 'assistant'
     message = Column(Text, nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
+    # Video context fields
+    video_context = Column(String, nullable=True)  # Optional context about which video this relates to
     session = relationship("ChatSession", back_populates="messages")

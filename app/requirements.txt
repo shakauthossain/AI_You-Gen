@@ -10,3 +10,8 @@ langchain-community
 langchain-text-splitters
 SQLAlchemy
 psycopg2-binary
+celery[redis]
+redis
+fastapi[all]
+uvicorn[standard]
+pydantic-settings

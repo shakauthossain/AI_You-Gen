@@ -1,5 +1,6 @@
 import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
+import { NavigationHeader } from "@/components/NavigationHeader";
 
 function Dashboard() {
   const { getToken } = useAuth();
@@ -16,8 +17,11 @@ function Dashboard() {
   }
 
   return (
-    <div className="p-4">
-      <Button onClick={callBackend}>Call Backend</Button>
+    <div className="min-h-screen bg-background">
+      <NavigationHeader />
+      <div className="p-4 pt-20">
+        <Button onClick={callBackend}>Call Backend</Button>
+      </div>
     </div>
   );
 }
