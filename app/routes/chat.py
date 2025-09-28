@@ -4,6 +4,7 @@ from sqlalchemy.exc import OperationalError, DisconnectionError
 from app.db import SessionLocal
 from app.models import ChatSession, ChatMessage
 from app.auth import get_current_user
+from app.utils.youtube import get_video_title
 from typing import List, Optional
 from datetime import datetime
 import time
@@ -16,9 +17,9 @@ router = APIRouter()
 try:
     from app.cache import ChatCache, cache_chat_sessions_task, cache_chat_messages_task
     CACHE_ENABLED = True
-    logger.info("✅ Cache functionality enabled")
+    logger.info("Cache functionality enabled")
 except ImportError as e:
-    logger.warning(f"⚠️ Cache functionality disabled: {e}")
+    logger.warning(f"Cache functionality disabled: {e}")
     CACHE_ENABLED = False
     
     # Fallback classes
@@ -79,13 +80,27 @@ def create_session(
     db: Session = Depends(get_db)
 ):
     def _create_session_operation():
+        # Get real video title from YouTube if video_url is provided
+        actual_video_title = video_title  # Default to provided title
+        if video_url:
+            try:
+                actual_video_title = get_video_title(video_url)
+                logger.info(f"Extracted video title: {actual_video_title}")
+            except Exception as e:
+                logger.warning(f"Failed to extract video title from {video_url}: {e}")
+                # Keep the provided title or create a default one
+                if not actual_video_title:
+                    import re
+                    video_id_match = re.search(r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)', video_url)
+                    actual_video_title = f"Video {video_id_match.group(1)}" if video_id_match else "Unknown Video"
+        
         # Create session with optional video context
-        session_title = title or video_title or "Untitled Session"
+        session_title = title or actual_video_title or "Untitled Session"
         session = ChatSession(
             user_id=user["sub"], 
             title=session_title,
             video_url=video_url,
-            video_title=video_title
+            video_title=actual_video_title
         )
         db.add(session)
         db.commit()
@@ -114,7 +129,7 @@ def list_sessions(user=Depends(get_current_user), db: Session = Depends(get_db))
     if CACHE_ENABLED:
         cached_sessions = ChatCache.get_chat_sessions(user_id)
         if cached_sessions:
-            logger.info(f"📚 Returning cached sessions for user: {user_id}")
+            logger.info(f"Returning cached sessions for user: {user_id}")
             return cached_sessions
     
     # If not in cache, get from database

@@ -276,15 +276,13 @@ export const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sticky Navigation */}
-      <div className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
-        <NavigationHeader />
-      </div>
+      {/* Floating Navigation */}
+      <NavigationHeader />
 
       {/* Hero Section */}
       <section
         ref={heroRef}
-        className="relative min-h-auto py-24 pt-28 flex items-center justify-center px-4 overflow-hidden bg-gradient-to-br from-background via-primary-dark/5 to-background"
+        className="relative min-h-auto py-24 pt-32 flex items-center justify-center px-4 overflow-hidden bg-gradient-to-br from-background via-primary-dark/5 to-background"
       >
         {/* Background Grid */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(112,137,147,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(112,137,147,0.1)_1px,transparent_1px)] bg-[size:100px_100px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_60%,transparent_100%)]"></div>
@@ -744,7 +742,7 @@ export const LandingPage = () => {
                     <div className="text-primary">{step.icon}</div>
                   </div>
 
-                  <div className="bg-card border border-border border-red-500 h-[220px] rounded-lg p-6 hover:shadow-lg transition-shadow duration-300">
+                  <div className="bg-card h-[220px] rounded-lg p-6 hover:shadow-lg transition-shadow duration-300">
                     <div className="flex items-center justify-center w-8 h-8 bg-primary text-primary-foreground rounded-full text-sm font-bold mb-4 mx-auto">
                       {index + 1}
                     </div>

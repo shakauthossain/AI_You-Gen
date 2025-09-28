@@ -28,7 +28,15 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 
-export function NavigationHeader() {
+interface NavigationHeaderProps {
+  videoTitle?: string;
+  isAppContext?: boolean;
+}
+
+export function NavigationHeader({
+  videoTitle,
+  isAppContext = false,
+}: NavigationHeaderProps) {
   const { theme, setTheme } = useTheme();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,27 +51,35 @@ export function NavigationHeader() {
 
   // Handle scroll effect
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
 
-      // Update scrolled state for background blur effect
-      setIsScrolled(currentScrollY > 10);
+          // Update scrolled state for background blur effect - reduced threshold for smoother transition
+          setIsScrolled(currentScrollY > 20);
 
-      // Only hide nav on app pages, not on landing page
-      if (isAppPage) {
-        if (currentScrollY < lastScrollY || currentScrollY <= 0) {
-          // Scrolling up or at top - show nav
-          setIsVisible(true);
-        } else if (currentScrollY > lastScrollY) {
-          // Scrolling down - hide nav immediately
-          setIsVisible(false);
-        }
-      } else {
-        // Always show on landing page
-        setIsVisible(true);
+          // Only hide nav on app pages, not on landing page
+          if (isAppPage) {
+            if (currentScrollY < lastScrollY || currentScrollY <= 0) {
+              // Scrolling up or at top - show nav
+              setIsVisible(true);
+            } else if (currentScrollY > lastScrollY) {
+              // Scrolling down - hide nav immediately
+              setIsVisible(false);
+            }
+          } else {
+            // Always show on landing page
+            setIsVisible(true);
+          }
+
+          setLastScrollY(currentScrollY);
+          ticking = false;
+        });
+        ticking = true;
       }
-
-      setLastScrollY(currentScrollY);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -82,15 +98,36 @@ export function NavigationHeader() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-background/95 backdrop-blur-md border-b shadow-sm"
-          : "bg-transparent"
-      } ${
-        isVisible ? "transform translate-y-0" : "transform -translate-y-full"
+      className={`${
+        isAppContext
+          ? "sticky top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50"
+          : `fixed top-4 left-4 right-4 z-50 max-w-7xl mx-auto ${
+              isScrolled
+                ? "backdrop-blur-xl border border-white/15 dark:border-white/[0.08] shadow-2xl shadow-black/10 dark:shadow-black/30 rounded-2xl hover:shadow-3xl hover:border-white/25 dark:hover:border-white/15"
+                : "bg-transparent border border-white/5 dark:border-white/[0.02] shadow-none rounded-2xl"
+            }`
+      } transition-all duration-700 ease-in-out ${
+        isVisible
+          ? "transform translate-y-0 opacity-100"
+          : "transform -translate-y-full opacity-0"
       }`}
+      style={
+        !isAppContext
+          ? {
+              backgroundColor: isScrolled ? "#e7f0ee80" : "transparent",
+              backdropFilter: isScrolled ? "blur(20px) saturate(180%)" : "none",
+              WebkitBackdropFilter: isScrolled
+                ? "blur(20px) saturate(180%)"
+                : "none",
+            }
+          : {}
+      }
     >
-      <nav className="container mx-auto px-6 py-4">
+      <nav
+        className={`transition-all duration-700 ease-in-out ${
+          isAppContext ? "px-8 py-3 max-w-7xl mx-auto" : "px-6 py-3"
+        }`}
+      >
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
@@ -104,6 +141,20 @@ export function NavigationHeader() {
                 </Badge>
               </div>
             </div>
+            {/* Video Title */}
+            {location.pathname !== "/" && videoTitle && (
+              <div className="hidden md:flex flex-col">
+                <span className="font-semibold text-sm text-foreground">
+                  AI You-Gen
+                </span>
+                <span
+                  className="text-xs text-muted-foreground truncate max-w-[300px]"
+                  title={videoTitle}
+                >
+                  {videoTitle}
+                </span>
+              </div>
+            )}
             {/* <img src="/logo.png" alt="Logo" className="w-[45%] h-auto" /> */}
           </Link>
 

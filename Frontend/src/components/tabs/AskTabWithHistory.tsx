@@ -103,12 +103,7 @@ export function AskTabWithHistory({
     }
   }, [conversations.length, chatMessages.length, isLoading]);
 
-  // Find or create session for current video
-  useEffect(() => {
-    if (url && chatSessions.length > 0) {
-      findOrCreateVideoSession(url);
-    }
-  }, [url, chatSessions]);
+  // Note: Session creation is handled by YouTubeQAApp.tsx to avoid duplicate sessions
 
   // Handle selectedChatSession from sidebar
   useEffect(() => {
@@ -449,20 +444,6 @@ export function AskTabWithHistory({
     }
   };
 
-  // Save AI responses to chat history
-  useEffect(() => {
-    if (conversations.length > 0 && currentSession) {
-      const lastConversation = conversations[conversations.length - 1];
-      if (lastConversation && !lastConversation.isSystem) {
-        console.log("🤖 Saving AI response to chat history:", {
-          sessionId: currentSession.session_id,
-          answerLength: lastConversation.answer.length,
-        });
-        saveToChatHistory(lastConversation.answer, "assistant", currentSession);
-      }
-    }
-  }, [conversations, currentSession]);
-
   const handleQuestionSelect = (selectedQuestion: string) => {
     console.log(
       "🔄 Selected previous question:",
@@ -566,7 +547,7 @@ export function AskTabWithHistory({
           )}
 
           {/* History Preview */}
-          {chatSessions.length > 0 && (
+          {/* {chatSessions.length > 0 && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-medium text-sm text-muted-foreground">
@@ -608,7 +589,7 @@ export function AskTabWithHistory({
                 ))}
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Features Preview */}
           <div className="grid grid-cols-3 gap-4 text-center">

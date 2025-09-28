@@ -65,17 +65,17 @@ def protected_route(user=Depends(get_current_user)):
 @app.on_event("startup")
 async def startup_event():
     """Application startup event"""
-    logger.info("🚀 Starting YouTube Extractor with caching...")
+    logger.info("Starting YouTube Extractor with caching...")
     
     # Test cache connectivity on startup
     try:
         from app.cache import test_redis_connection, CACHE_ENABLED
         if CACHE_ENABLED:
             if test_redis_connection():
-                logger.info("✅ Redis connection successful")
+                logger.info("Redis connection successful")
             else:
-                logger.warning("⚠️ Redis connection failed - running without cache")
+                logger.warning("Redis connection failed - running without cache")
         else:
-            logger.info("ℹ️ Cache disabled")
+            logger.info("Cache disabled")
     except ImportError:
-        logger.info("ℹ️ Cache dependencies not available - running without cache")
+        logger.info("Cache dependencies not available - running without cache")

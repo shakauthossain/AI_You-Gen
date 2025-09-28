@@ -73,7 +73,7 @@ export function ContentCanvas({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-background border-top border-border border-2 relative">
+    <div className="flex-1 flex flex-col bg-background relative">
       <Tabs defaultValue="ask" className="flex-1 flex flex-col">
         <div className="border-b bg-card/30 px-6 py-3 align-middle flex justify-center">
           <TabsList className="grid w-full max-w-2xl grid-cols-5">
@@ -145,19 +145,21 @@ export function ContentCanvas({
         </div>
       </Tabs>
 
-      {/* Global Question Input */}
-      <QuestionInput
-        question={question}
-        setQuestion={setQuestion}
-        onAskQuestion={handleAskQuestion}
-        canAsk={canAsk}
-        isAsking={isAsking}
-        isLoading={isLoading}
-        currentSession={currentSession}
-        questions={state.questions}
-        onQuestionSelect={onQuestionSelect}
-        onKeyDown={onKeyDown}
-      />
+      {/* Global Question Input - Only show when transcript is loaded */}
+      {state.transcriptStatus === "loaded" && (
+        <QuestionInput
+          question={question}
+          setQuestion={setQuestion}
+          onAskQuestion={handleAskQuestion}
+          canAsk={canAsk}
+          isAsking={isAsking}
+          isLoading={isLoading}
+          currentSession={currentSession}
+          questions={state.questions}
+          onQuestionSelect={onQuestionSelect}
+          onKeyDown={onKeyDown}
+        />
+      )}
     </div>
   );
 }

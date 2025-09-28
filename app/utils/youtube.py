@@ -16,6 +16,72 @@ from youtube_transcript_api._errors import (
 from app.config import EMBED_MODEL_NAME
 
 
+def get_video_title(url: str) -> str:
+    """
+    Extract actual video title from YouTube URL using YoutubeLoader
+    Returns the real video title, not just the video ID
+    """
+    try:
+        # First attempt: Use YoutubeLoader with video info to get title
+        loader = YoutubeLoader.from_youtube_url(
+            url,
+            add_video_info=True,  # This adds video metadata including title
+            language=["en", "en-US"],
+            translation=None,
+            continue_on_failure=False,
+        )
+        docs = loader.load()
+        
+        # Extract title from metadata
+        if docs and len(docs) > 0:
+            metadata = docs[0].metadata
+            title = metadata.get('title')
+            if title and title.strip():
+                print(f"Successfully extracted video title: {title}")
+                return title.strip()
+            
+            # Check other possible title fields
+            for title_field in ['title', 'video_title', 'name']:
+                if metadata.get(title_field):
+                    title = metadata[title_field].strip()
+                    if title:
+                        print(f"Extracted video title from {title_field}: {title}")
+                        return title
+        
+        print("No title found in video metadata, trying alternative method...")
+        
+    except Exception as e:
+        print(f"Primary title extraction failed: {e}")
+    
+    # Alternative method: Try with different loader settings
+    try:
+        print("Attempting alternative title extraction...")
+        loader = YoutubeLoader.from_youtube_url(
+            url,
+            add_video_info=True,
+            language=["en"],
+            continue_on_failure=True,
+        )
+        docs = loader.load()
+        if docs and docs[0].metadata.get('title'):
+            title = docs[0].metadata['title'].strip()
+            print(f"Alternative method extracted title: {title}")
+            return title
+            
+    except Exception as e:
+        print(f"Alternative title extraction failed: {e}")
+    
+    # Final fallback: extract video ID and return a descriptive name
+    print("All title extraction methods failed, using video ID fallback...")
+    import re
+    video_id_match = re.search(r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)', url)
+    if video_id_match:
+        video_id = video_id_match.group(1)
+        return f"YouTube Video ({video_id})"
+    
+    return "YouTube Video (Unknown ID)"
+
+
 def _load_with_langchain(url: str, add_video_info: bool):
     """
     Use LangChain's YoutubeLoader. With add_video_info=False it avoids pytube

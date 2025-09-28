@@ -369,11 +369,8 @@ export function YouTubeQAApp() {
       // Save the question and answer to regular conversation state
       actions.addConversation(question, response.answer, response.snippets);
 
-      // Save the user's question to chat history using the session we just ensured
-      await saveToChatHistory(question.trim(), "user", session);
-      console.log("💾 Question saved to chat history");
-
-      // Save the AI's answer to chat history
+      // Note: User question is already saved by AskTabWithHistory.tsx
+      // Only save the AI's answer to chat history
       await saveToChatHistory(response.answer, "assistant", session);
       console.log("💾 Answer saved to chat history");
 
@@ -620,9 +617,12 @@ export function YouTubeQAApp() {
       disableTransitionOnChange
     >
       <div className="min-h-screen bg-background flex flex-col">
-        <NavigationHeader />
+        <NavigationHeader
+          videoTitle={currentSession?.video_title}
+          isAppContext={true}
+        />
 
-        <div className="flex-1 flex overflow-hidden pt-16 border-t border-border relative ">
+        <div className="flex-1 flex overflow-hidden border-t border-border relative">
           {/* <LeftRail state={state} /> */}
 
           <ChatHistorySidebar
