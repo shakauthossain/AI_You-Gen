@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import OperationalError, DisconnectionError
-from app.db import SessionLocal
-from app.models import ChatSession, ChatMessage
-from app.auth import get_current_user
-from app.utils.youtube import get_video_title
+from db import SessionLocal
+from models import ChatSession, ChatMessage
+from auth import get_current_user
+from utils.youtube import get_video_title
 from typing import List, Optional
 from datetime import datetime
 import time
@@ -15,7 +15,7 @@ router = APIRouter()
 
 # Import cache functionality (with fallback if Redis not available)
 try:
-    from app.cache import ChatCache, cache_chat_sessions_task, cache_chat_messages_task
+    from cache import ChatCache, cache_chat_sessions_task, cache_chat_messages_task
     CACHE_ENABLED = True
     logger.info("Cache functionality enabled")
 except ImportError as e:

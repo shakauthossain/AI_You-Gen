@@ -2,11 +2,11 @@ from fastapi import APIRouter, HTTPException
 from fastapi.concurrency import run_in_threadpool
 import google.generativeai as genai
 
-from app.schemas import MCQRequest, MCQTextResponse
-from app.cache import video_cache
-from app.utils.llm import extract_text
-from app.utils.mcq import MCQ_TEMPLATE
-from app.utils.pdf_docx import mcqs_to_pdf, mcqs_to_docx
+from schemas import MCQRequest, MCQTextResponse
+from cache import video_cache
+from utils.llm import extract_text
+from utils.mcq import MCQ_TEMPLATE
+from utils.pdf_docx import mcqs_to_pdf, mcqs_to_docx
 
 router = APIRouter()
 
@@ -23,7 +23,7 @@ async def generate_mcqs(req: MCQRequest):
         model = genai.GenerativeModel("gemini-2.0-flash")
         resp = model.generate_content(prompt)
         mcq_text = extract_text(resp)
-        from app.utils.llm import parse_mcq_text
+        from utils.llm import parse_mcq_text
         mcqs = parse_mcq_text(mcq_text)
         return {"mcqs": mcqs}
 

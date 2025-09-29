@@ -1,12 +1,12 @@
-from app.utils.llm import extract_text
+from utils.llm import extract_text
 import google.generativeai as genai
 from fastapi import APIRouter, HTTPException, Body
 from fastapi.concurrency import run_in_threadpool
 from typing import List, Dict
 from fastapi.concurrency import run_in_threadpool
-from app.schemas import VideoURLRequest, LoadResponse
-from app.cache import video_cache
-from app.utils.youtube import load_and_index
+from schemas import VideoURLRequest, LoadResponse
+from cache import video_cache
+from utils.youtube import load_and_index
 
 router = APIRouter()
 
@@ -33,7 +33,7 @@ Summary:
         try:
             model = genai.GenerativeModel("gemini-2.0-flash")
             resp = model.generate_content(prompt)
-            from app.utils.llm import extract_text
+            from utils.llm import extract_text
             summary = extract_text(resp)
         except Exception as e:
             print(f"[SUMMARY] LLM summary generation failed: {e}")
@@ -142,6 +142,6 @@ Begin your {style} post below:
 """
     model = genai.GenerativeModel("gemini-1.5-flash")
     resp = model.generate_content(prompt)
-    from app.utils.llm import extract_text
+    from utils.llm import extract_text
     blog = extract_text(resp)
     return {"style": style, "content": blog}

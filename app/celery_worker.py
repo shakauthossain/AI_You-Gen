@@ -11,7 +11,7 @@ from pathlib import Path
 app_dir = Path(__file__).parent
 sys.path.insert(0, str(app_dir))
 
-from app.cache import celery_app
+from cache import celery_app
 
 if __name__ == '__main__':
     # Start Celery worker

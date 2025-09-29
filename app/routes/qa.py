@@ -2,10 +2,10 @@ from fastapi import APIRouter, HTTPException
 from fastapi.concurrency import run_in_threadpool
 import google.generativeai as genai
 
-from app.schemas import QuestionRequest, QAResponse
-from app.cache import video_cache
-from app.utils.llm import extract_text
-from app.utils.youtube import build_snippet
+from schemas import QuestionRequest, QAResponse
+from cache import video_cache
+from utils.llm import extract_text
+from utils.youtube import build_snippet
 
 router = APIRouter()
 

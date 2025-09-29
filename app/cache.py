@@ -5,8 +5,8 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from celery import Celery
 from sqlalchemy.orm import Session
-from app.models import ChatSession, ChatMessage
-from app.config import get_settings
+from models import ChatSession, ChatMessage
+from config import get_settings
 
 logger = logging.getLogger(__name__)
 settings = get_settings()

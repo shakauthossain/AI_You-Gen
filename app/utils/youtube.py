@@ -13,7 +13,7 @@ from youtube_transcript_api._errors import (
     VideoUnavailable,
 )
 
-from app.config import EMBED_MODEL_NAME
+from config import EMBED_MODEL_NAME
 
 
 def get_video_title(url: str) -> str:
