@@ -2,8 +2,8 @@ import os
 import logging
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import transcript, qa, mcq, chat
-from app.auth import get_current_user
+from routes import transcript, qa, mcq, chat
+from auth import get_current_user
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
