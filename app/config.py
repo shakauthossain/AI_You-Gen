@@ -45,6 +45,7 @@ class Settings(BaseSettings):
     
     class Config:
         env_file = ".env"
+        extra = "allow"  # Allow extra fields to prevent validation errors
 
 def get_settings() -> Settings:
     return Settings()
