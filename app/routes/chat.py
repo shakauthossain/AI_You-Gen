@@ -209,7 +209,7 @@ def get_messages(session_id: int, user=Depends(get_current_user), db: Session = 
     if CACHE_ENABLED:
         cached_messages = ChatCache.get_chat_messages(session_id)
         if cached_messages:
-            logger.info(f"💬 Returning cached messages for session: {session_id}")
+            logger.info(f"Returning cached messages for session: {session_id}")
             return cached_messages
     
     def _get_messages_operation():

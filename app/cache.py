@@ -57,12 +57,12 @@ class ChatCache:
             key = CHAT_SESSIONS_KEY.format(user_id=user_id)
             cached_data = redis_client.get(key)
             if cached_data:
-                logger.info(f"📚 Cache hit for chat sessions: {user_id}")
+                logger.info(f"Cache hit for chat sessions: {user_id}")
                 return json.loads(cached_data)
-            logger.info(f"📚 Cache miss for chat sessions: {user_id}")
+            logger.info(f"Cache miss for chat sessions: {user_id}")
             return None
         except Exception as e:
-            logger.error(f"❌ Error getting cached chat sessions: {e}")
+            logger.error(f"Error getting cached chat sessions: {e}")
             return None
     
     @staticmethod
@@ -75,10 +75,10 @@ class ChatCache:
                 CHAT_SESSION_EXPIRE, 
                 json.dumps(sessions, default=str)
             )
-            logger.info(f"💾 Cached {len(sessions)} chat sessions for user: {user_id}")
+            logger.info(f"Cached {len(sessions)} chat sessions for user: {user_id}")
             return True
         except Exception as e:
-            logger.error(f"❌ Error caching chat sessions: {e}")
+            logger.error(f"Error caching chat sessions: {e}")
             return False
     
     @staticmethod
@@ -88,12 +88,12 @@ class ChatCache:
             key = CHAT_MESSAGES_KEY.format(session_id=session_id)
             cached_data = redis_client.get(key)
             if cached_data:
-                logger.info(f"💬 Cache hit for chat messages: {session_id}")
+                logger.info(f"Cache hit for chat messages: {session_id}")
                 return json.loads(cached_data)
-            logger.info(f"💬 Cache miss for chat messages: {session_id}")
+            logger.info(f"Cache miss for chat messages: {session_id}")
             return None
         except Exception as e:
-            logger.error(f"❌ Error getting cached chat messages: {e}")
+            logger.error(f"Error getting cached chat messages: {e}")
             return None
     
     @staticmethod
@@ -106,10 +106,10 @@ class ChatCache:
                 CHAT_MESSAGES_EXPIRE, 
                 json.dumps(messages, default=str)
             )
-            logger.info(f"💾 Cached {len(messages)} messages for session: {session_id}")
+            logger.info(f"Cached {len(messages)} messages for session: {session_id}")
             return True
         except Exception as e:
-            logger.error(f"❌ Error caching chat messages: {e}")
+            logger.error(f"Error caching chat messages: {e}")
             return False
     
     @staticmethod
@@ -121,7 +121,7 @@ class ChatCache:
             cached_messages.append(message)
             return ChatCache.set_chat_messages(session_id, cached_messages)
         except Exception as e:
-            logger.error(f"❌ Error adding message to cache: {e}")
+            logger.error(f"Error adding message to cache: {e}")
             return False
     
     @staticmethod
@@ -132,9 +132,9 @@ class ChatCache:
             keys = redis_client.keys(pattern)
             if keys:
                 redis_client.delete(*keys)
-                logger.info(f"🗑️ Invalidated {len(keys)} cache entries for user: {user_id}")
+                logger.info(f"Invalidated {len(keys)} cache entries for user: {user_id}")
         except Exception as e:
-            logger.error(f"❌ Error invalidating user cache: {e}")
+            logger.error(f"Error invalidating user cache: {e}")
     
     @staticmethod
     def invalidate_session_cache(session_id: int):
@@ -142,9 +142,9 @@ class ChatCache:
         try:
             key = CHAT_MESSAGES_KEY.format(session_id=session_id)
             redis_client.delete(key)
-            logger.info(f"🗑️ Invalidated cache for session: {session_id}")
+            logger.info(f"Invalidated cache for session: {session_id}")
         except Exception as e:
-            logger.error(f"❌ Error invalidating session cache: {e}")
+            logger.error(f"Error invalidating session cache: {e}")
 
 # Celery background tasks
 @celery_app.task(bind=True, max_retries=3)
@@ -176,13 +176,13 @@ def cache_chat_sessions_task(self, user_id: str, db_session_data: str):
             
             # Cache the data
             ChatCache.set_chat_sessions(user_id, sessions_data)
-            logger.info(f"✅ Background task cached {len(sessions_data)} sessions for user: {user_id}")
+            logger.info(f"Background task cached {len(sessions_data)} sessions for user: {user_id}")
             
         finally:
             db.close()
             
     except Exception as exc:
-        logger.error(f"❌ Background caching task failed: {exc}")
+        logger.error(f"Background caching task failed: {exc}")
         # Retry with exponential backoff
         raise self.retry(exc=exc, countdown=60 * (2 ** self.request.retries))
 
@@ -214,13 +214,13 @@ def cache_chat_messages_task(self, session_id: int):
             
             # Cache the data
             ChatCache.set_chat_messages(session_id, messages_data)
-            logger.info(f"✅ Background task cached {len(messages_data)} messages for session: {session_id}")
+            logger.info(f"Background task cached {len(messages_data)} messages for session: {session_id}")
             
         finally:
             db.close()
             
     except Exception as exc:
-        logger.error(f"❌ Background message caching task failed: {exc}")
+        logger.error(f"Background message caching task failed: {exc}")
         raise self.retry(exc=exc, countdown=60 * (2 ** self.request.retries))
 
 @celery_app.task
@@ -230,7 +230,7 @@ def cleanup_expired_cache():
         # This is handled automatically by Redis TTL, but we can add custom cleanup logic here
         logger.info("🧹 Cache cleanup task completed")
     except Exception as e:
-        logger.error(f"❌ Cache cleanup failed: {e}")
+        logger.error(f"Cache cleanup failed: {e}")
 
 # Periodic task configuration
 celery_app.conf.beat_schedule = {
@@ -247,10 +247,10 @@ def test_redis_connection() -> bool:
     """Test Redis connection"""
     try:
         redis_client.ping()
-        logger.info("✅ Redis connection successful")
+        logger.info("Redis connection successful")
         return True
     except Exception as e:
-        logger.error(f"❌ Redis connection failed: {e}")
+        logger.error(f"Redis connection failed: {e}")
         return False
 
 def test_celery_connection() -> bool:
@@ -258,11 +258,11 @@ def test_celery_connection() -> bool:
     try:
         result = celery_app.control.inspect().stats()
         if result:
-            logger.info("✅ Celery connection successful")
+            logger.info("Celery connection successful")
             return True
         else:
-            logger.warning("⚠️ Celery workers not available")
+            logger.warning("Celery workers not available")
             return False
     except Exception as e:
-        logger.error(f"❌ Celery connection failed: {e}")
+        logger.error(f"Celery connection failed: {e}")
         return False

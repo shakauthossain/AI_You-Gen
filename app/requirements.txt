@@ -15,3 +15,4 @@ redis
 fastapi[all]
 uvicorn[standard]
 pydantic-settings
+google-generativeai

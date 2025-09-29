@@ -1,0 +1,80 @@
+# Node modules and build artifacts
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+
+# Documentation
+*.md
+README*
+
+# Test files
+test_*
+*_test.py
+tests/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Log files
+*.log
+logs/
+
+# Environment files
+.env*
+
+# Cache directories
+.cache/
+.tmp/
+temp/
+
+# Old files
+Old/
+
+# Jupyter notebooks
+*.ipynb
+
+# Large files that shouldn't be in containers
+*.zip
+*.tar
+*.tar.gz
+*.rar
