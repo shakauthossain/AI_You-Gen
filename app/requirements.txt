@@ -16,3 +16,5 @@ fastapi[all]
 uvicorn[standard]
 pydantic-settings
 google-generativeai
+python-jose[cryptography]
+faiss-cpu

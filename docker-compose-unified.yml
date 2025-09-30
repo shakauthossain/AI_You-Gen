@@ -1,0 +1,80 @@
+services:
+  # ===================================
+  # Backend Service (FastAPI)
+  # ===================================
+  backend:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: youtube_extractor_backend
+    ports:
+      - "8003:8003"
+    environment:
+      - DATABASE_URL=${NEON_DATABASE_URL}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+      - CLERK_FRONTEND_API=${CLERK_FRONTEND_API}
+      - CLERK_AUDIENCE=${CLERK_AUDIENCE}
+      - EMBED_MODEL_NAME=${EMBED_MODEL_NAME:-sentence-transformers/all-MiniLM-L6-v2}
+      - PDF_TTF_PATH=${PDF_TTF_PATH:-DejaVuSans.ttf}
+      - YOUTUBE_TRANSLATION=${YOUTUBE_TRANSLATION:-en}
+      - CORS_ALLOW_ORIGINS=${CORS_ALLOW_ORIGINS:-http://localhost:3003,https://yougen.hellonotionhive.com}
+      - APP_ENV=${APP_ENV:-development}
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import requests; requests.get('http://localhost:8003/health')",
+        ]
+      interval: 30s
+      timeout: 10s
+      start_period: 5s
+      retries: 3
+    networks:
+      - youtube-extractor-network
+
+  # ===================================
+  # Frontend Service (React + Nginx)
+  # ===================================
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: youtube_extractor_frontend
+    ports:
+      - "3003:80"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8003
+      - VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
+      - VITE_CLERK_SIGN_IN_URL=${VITE_CLERK_SIGN_IN_URL:-/sign-in}
+      - VITE_CLERK_SIGN_UP_URL=${VITE_CLERK_SIGN_UP_URL:-/sign-up}
+      - VITE_CLERK_AFTER_SIGN_IN_URL=${VITE_CLERK_AFTER_SIGN_IN_URL:-/app}
+      - VITE_CLERK_AFTER_SIGN_UP_URL=${VITE_CLERK_AFTER_SIGN_UP_URL:-/app}
+      - NODE_ENV=${NODE_ENV:-production}
+    env_file:
+      - ./Frontend/.env
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      start_period: 5s
+      retries: 3
+    networks:
+      - youtube-extractor-network
+
+# ===================================
+# Networks
+# ===================================
+networks:
+  youtube-extractor-network:
+    driver: bridge
+    name: youtube-extractor-network
